@@ -36,6 +36,8 @@ public class TestModalidadesScreen {
     public static final String XPATH_CONTENTTABLE = "/html/body/div[2]/main/div[2]";
     public static final String XPATH_CONTAINER_INSERT = "/html/body/div[1]/div";
     public static final String XPATH_DATA_OFERECIMENTO = "/html/body/div[1]/div/form/div[1]/input";
+    public static final String X_PATH_DESCRICAO = "/html/body/div[1]/div/form/input[1]";
+    public static final String X_PATH_NOME_PROFESSOR = "/html/body/div[1]/div/form/div[3]/input";
 
     Faker faker = new Faker();
 
@@ -61,7 +63,7 @@ public class TestModalidadesScreen {
     @Test
     @Tag("Modalidades Screend")
     @DisplayName("Should open page and click on Incluir return Modalidades not exist")
-    public void shouldOpenSite() throws InterruptedException {
+    public void shouldopenpageandclickonIncluirreturnModalidadesnotexist() throws InterruptedException {
         final WebElement button = getWebElement(driver, XPATH_BUTTON_INSERT);
         button.click();
         final WebElement container = getWebElement(driver, XPATH_CONTAINERDEAVISO);
@@ -73,7 +75,7 @@ public class TestModalidadesScreen {
     @Test
     @Tag("Modalidades Screend")
     @DisplayName("Should show error message when inserting a negative number in the inclusion modalidade")
-    public void shouldShowErrorForNegativeNumber() throws InterruptedException {
+    public void shouldshowerrormessagewheninsertinganegativenumberintheinclusionmodalidade() throws InterruptedException {
 
         final WebElement inputField = getWebElement(driver, XPATH_INPUT_FIELD);
         String codigo = faker.numerify("-###");
@@ -154,7 +156,7 @@ public class TestModalidadesScreen {
     @Test
     @Tag("Modalidades Screend")
     @DisplayName("Should provide a date in the past for the offering days")
-    public void shouldOpenSiteAndFillAFutureDateForDataDeNascimento() {
+    public void Shouldprovideadateinthepastfortheofferingdays() {
         final WebElement inputField = getWebElement(driver, XPATH_INPUT_FIELD);
         String codigo = faker.numerify("-###");
         inputField.sendKeys(codigo);
@@ -175,6 +177,25 @@ public class TestModalidadesScreen {
         Assertions.fail("Não foi retornado o erro devido a data no passado, segue os dados permitidos em cadastro: " + contentTable.getText());
     }
 
+    @Test
+    @Tag("Modalidades Screend")
+    @DisplayName("should insert number in teacher's name")
+    public void shouldinsertnumberinteachersname() {
+        final WebElement inputField = getWebElement(driver, XPATH_INPUT_FIELD);
+        String codigo = faker.numerify("###");
+        inputField.sendKeys(codigo);
+        new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(in -> codigo.equals(inputField.getAttribute("value")));
+        final WebElement buttonIncluir = getWebElement(driver, XPATH_BUTTON_INSERT);
+        buttonIncluir.click();
+        final WebElement nomeProfessor = getWebElement(driver, X_PATH_NOME_PROFESSOR);
+        String nome = faker.numerify("####");
+        nomeProfessor.sendKeys(nome);
+        final WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
+        buttonFinalizar.click();
+        final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
+        Assertions.fail("Não podemos inserir número no nome, segue o preenchimento do nome: " + contentTable.getText());
+    }
 
     //@AfterEach
     //void tearDown() {
