@@ -11,13 +11,15 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.github.javafaker.Faker;
 
 
-
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Log4j2
-public class TestAulasScreen {
+public class TestAlunosScreen {
     public static final String XPATH_CONTAINERDEAVISO = "/html/body/div[1]/div";
     public static final String LOCALDRIVER = "src/main/resources/drivers/chromedriver.exe";
     public static final String PROPERTY = "webdriver.chrome.driver";
@@ -30,6 +32,7 @@ public class TestAulasScreen {
     public static final String XPATH_BUTTON_FINALIZAR = "/html/body/div[1]/div/form/div[3]/a[2]";
     public static final String XPATH_BUTTON_LISTAR = "/html/body/div[2]/main/div[1]/ul/li[2]/a";
     public static final String XPATH_CONTENTTABLE = "/html/body/div[2]/main/div[2]";
+    public static final String XPATH_DATE_INPUT = "/html/body/div[1]/div/form/input[2]";
     Faker faker = new Faker();
     private WebDriver driver;
     ChromeOptions chromeOptions = new ChromeOptions();
@@ -96,6 +99,29 @@ public class TestAulasScreen {
         }
     }
 
+    @Test
+    @DisplayName("Should open Site and fill a future date for Data de nascimento")
+    public void shouldOpenSiteAndFillAFutureDateForDataDeNascimento() {
+        final WebElement input = getWebElement(driver,XPATH_INSERIR_CPF);
+        String cpf = faker.numerify("###.###.###-##");
+        input.sendKeys(cpf);
+        new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(in -> cpf.equals(input.getAttribute("value")));
+        final WebElement buttonIncluir = getWebElement(driver,XPATH_BUTTON_INSERT);
+        buttonIncluir.click();
+        Date dataNascimento = faker.date().future(90,TimeUnit.DAYS);
+        String dataNascimentoFormatada = new SimpleDateFormat("dd-MM-yyyy").format(dataNascimento);
+        final WebElement dateInput = getWebElement(driver, XPATH_DATE_INPUT);
+        dateInput.click();
+        dateInput.sendKeys(dataNascimentoFormatada);
+        final WebElement buttonFinalizar = getWebElement(driver,XPATH_BUTTON_FINALIZAR);
+        buttonFinalizar.click();
+        final WebElement buttonListar = getWebElement(driver,XPATH_BUTTON_LISTAR);
+        buttonListar.click();
+        final WebElement contentTable = getWebElement(driver,XPATH_CONTENTTABLE);
+        Assertions.fail("Não foi retornado o erro, segue os dados permitidos em cadastro: " + contentTable.getText());
+
+    }
     //@AfterEach
     //void tearDown() {
         //try{
