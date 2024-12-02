@@ -33,6 +33,8 @@ public class TestAlunosScreen {
     public static final String XPATH_BUTTON_LISTAR = "/html/body/div[2]/main/div[1]/ul/li[2]/a";
     public static final String XPATH_CONTENTTABLE = "/html/body/div[2]/main/div[2]";
     public static final String XPATH_DATE_INPUT = "/html/body/div[1]/div/form/input[2]";
+    public static final String XPATH_PESO_INPUT = "/html/body/div[1]/div/form/input[3]";
+    public static final String XPATH_ALTURA_INPUT = "/html/body/div[1]/div/form/input[4]";
     Faker faker = new Faker();
     private WebDriver driver;
     ChromeOptions chromeOptions = new ChromeOptions();
@@ -120,8 +122,31 @@ public class TestAlunosScreen {
         buttonListar.click();
         final WebElement contentTable = getWebElement(driver,XPATH_CONTENTTABLE);
         Assertions.fail("Não foi retornado o erro, segue os dados permitidos em cadastro: " + contentTable.getText());
-
     }
+    @Test
+    @DisplayName("Should open Site and fill some fields with negative values return error")
+    public void shouldOpenSiteAndFillSomeFieldsWithNegativeValuesReturn() {
+        final WebElement input = getWebElement(driver,XPATH_INSERIR_CPF);
+        String cpf = faker.numerify("###.###.###-##");
+        input.sendKeys(cpf);
+        new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(in -> cpf.equals(input.getAttribute("value")));
+        final WebElement buttonIncluir = getWebElement(driver,XPATH_BUTTON_INSERT);
+        buttonIncluir.click();
+        final WebElement pesoInput = getWebElement(driver, XPATH_PESO_INPUT);
+        String peso = faker.numerify("-##");
+        pesoInput.sendKeys(peso);
+        final WebElement alturaInput = getWebElement(driver, XPATH_ALTURA_INPUT);
+        String alturaEmMetros = faker.numerify("-##");
+        alturaInput.sendKeys(alturaEmMetros);
+        final WebElement buttonFinalizar = getWebElement(driver,XPATH_BUTTON_FINALIZAR);
+        buttonFinalizar.click();
+        final WebElement buttonListar = getWebElement(driver,XPATH_BUTTON_LISTAR);
+        buttonListar.click();
+        final WebElement contentTable = getWebElement(driver,XPATH_CONTENTTABLE);
+        Assertions.fail("Não foi retornado o erro, segue os dados permitidos em cadastro: " + contentTable.getText());
+    }
+
     //@AfterEach
     //void tearDown() {
         //try{
