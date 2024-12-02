@@ -1,9 +1,7 @@
 
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -41,9 +39,8 @@ public class TestAlunosScreen {
     private WebDriver driver;
     ChromeOptions chromeOptions = new ChromeOptions();
     public WebElement getWebElement( WebDriver driver,String xPath) {
-        new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+        return new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
                 .until(ExpectedConditions.elementToBeClickable(By.xpath(xPath)));
-        return driver.findElement(By.xpath(xPath));
     }
 
 
@@ -196,6 +193,52 @@ public class TestAlunosScreen {
         assertNotEquals("undefined", heightValue,
                 "O Valor da Altura está sendo representado como undefined");
     }
+    @Test
+    @DisplayName("Should be possible to view the 'Altura' field completely in different resolutions")
+    public void shouldBePossibleToViewTheAlturaFieldCompletelyInDifferentResolutions() {
+        Dimension[] screenSizes = {
+                new Dimension(1920, 1080),  // Desktop
+                new Dimension(1024, 768),  // Tablet (landscape)
+                new Dimension(768, 1024),  // Tablet (portrait)
+                new Dimension(375, 812)   // Mobile (iPhone X)
+        };
+
+        // Preencher CPF
+        final WebElement input = getWebElement(driver, XPATH_INSERIR_CPF);
+        String cpf = faker.numerify("###.###.###-##");
+        input.sendKeys(cpf);
+        new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(in -> cpf.equals(input.getAttribute("value")));
+
+        // Clicar em "Incluir"
+        final WebElement buttonIncluir = getWebElement(driver, XPATH_BUTTON_INSERT);
+        buttonIncluir.click();
+
+        // Preencher Peso
+        final WebElement pesoInput = getWebElement(driver, XPATH_PESO_INPUT);
+        pesoInput.sendKeys(faker.numerify("-##"));
+        //Prencher Altura
+        final WebElement alturaInput = getWebElement(driver, XPATH_ALTURA_INPUT);
+        alturaInput.sendKeys(faker.numerify("-#,#"));
+        final WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
+        buttonFinalizar.click();
+        final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
+        buttonListar.click();
+
+        // Verificar o campo Altura em diferentes resoluções
+        for (Dimension dimension : screenSizes) {
+            driver.manage().window().setSize(dimension);
+
+            // Reencontrar o elemento altura para garantir sua localização atual
+            try{
+                final WebElement height = getWebElement(driver, XPATH_HEIGHT);
+            }catch (Exception e){
+                fail("Não foi possível obter a altura na dimensão: " + dimension);
+            }
+        }
+    }
+
+
     //@AfterEach
     //void tearDown() {
         //try{
