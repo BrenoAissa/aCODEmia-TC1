@@ -13,8 +13,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -32,6 +35,7 @@ public class TestModalidadesScreen {
     public static final String XPATH_BUTTON_LISTAR = "/html/body/div[2]/main/div[1]/ul/li[2]/a";
     public static final String XPATH_CONTENTTABLE = "/html/body/div[2]/main/div[2]";
     public static final String XPATH_CONTAINER_INSERT = "/html/body/div[1]/div";
+    public static final String XPATH_DATA_OFERECIMENTO = "/html/body/div[1]/div/form/div[1]/input";
 
     Faker faker = new Faker();
 
@@ -156,6 +160,34 @@ public class TestModalidadesScreen {
                     ", segue os dados permitidos em cadastro: " + contentTable.getText());
     }
 
+    @Test
+    @DisplayName("Should provide a date in the past for the offering days")
+    public void shouldOpenSiteAndFillAFutureDateForDataDeNascimento() {
+        log.info("Accessing site");
+
+        driver.get(URL);
+
+        final WebElement inputField = new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath(XPATH_INPUT_FIELD)));
+
+        String codigo = faker.numerify("-###");
+        inputField.sendKeys(codigo);
+        new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(in -> codigo.equals(inputField.getAttribute("value")));
+        final WebElement buttonIncluir = getWebElement(driver,XPATH_BUTTON_INSERT);
+        buttonIncluir.click();
+        Date dataOferecimento = faker.date().past(90, TimeUnit.DAYS);
+        String dataOferecimentoFormatada = new SimpleDateFormat("dd-MM-yyyy").format(dataOferecimento);
+        final WebElement dateInput = getWebElement(driver, XPATH_DATA_OFERECIMENTO);
+        dateInput.click();
+        dateInput.sendKeys(dataOferecimentoFormatada);
+        final WebElement buttonFinalizar = getWebElement(driver,XPATH_BUTTON_FINALIZAR);
+        buttonFinalizar.click();
+        final WebElement buttonListar = getWebElement(driver,XPATH_BUTTON_LISTAR);
+        buttonListar.click();
+        final WebElement contentTable = getWebElement(driver,XPATH_CONTENTTABLE);
+        Assertions.fail("Não foi retornado o erro devido a data no passado, segue os dados permitidos em cadastro: " + contentTable.getText());
+    }
 
 
     //@AfterEach
