@@ -14,6 +14,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 
 import java.time.Duration;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -30,6 +31,8 @@ public class TestModalidadesScreen {
     public static final String XPATH_BUTTON_FINALIZAR = "/html/body/div[1]/div/form/div[4]/a[2]";
     public static final String XPATH_BUTTON_LISTAR = "/html/body/div[2]/main/div[1]/ul/li[2]/a";
     public static final String XPATH_CONTENTTABLE = "/html/body/div[2]/main/div[2]";
+    public static final String XPATH_CONTAINER_INSERT = "/html/body/div[1]/div";
+
     Faker faker = new Faker();
 
     private WebDriver driver;
@@ -83,6 +86,76 @@ public class TestModalidadesScreen {
         final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
         Assertions.fail("Não foi retornado mensagem sobre inserção de número negativo, segue os dados permitidos em cadastro: " + contentTable.getText());
     }
+
+    @Test
+    @DisplayName("Should display error message if any field is empty when Finalizar is clicked")
+    public void shouldShowErrorMessageIfFieldIsEmptyOnFinalizar() throws InterruptedException {
+        log.info("Accessing site");
+
+        // Acessa o site
+        driver.get(URL);
+
+        final WebElement inputField = new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath(XPATH_INPUT_FIELD)));
+
+        String codigo = faker.numerify("-###");
+        inputField.sendKeys(codigo);
+
+        final WebElement button = new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(XPATH_BUTTON_INSERT)));
+        button.click();
+
+
+        // Localiza o container principal
+        final WebElement container = new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath(XPATH_CONTAINER_INSERT)));
+
+        // Localiza todos os campos dentro do container
+        List<WebElement> fields = container.findElements(By.xpath(".//input|.//textarea|.//select"));
+
+        boolean isAnyFieldEmpty = false;
+
+        // Verifica se algum campo está vazio
+        for (WebElement field : fields) {
+            String fieldType = field.getTagName();
+            String value = "";
+
+            switch (fieldType) {
+                case "input":
+                case "textarea":
+                    // Obtém o valor do campo
+                    value = field.getAttribute("value");
+                    break;
+
+                case "select":
+                    // Obtém o texto da opção selecionada
+                    WebElement selectedOption = field.findElement(By.xpath(".//option[@selected]"));
+                    value = selectedOption.getText();
+                    break;
+
+                default:
+                    log.warn("Field type {} is not being checked for value", fieldType);
+                    continue;
+            }
+
+            log.info("Field value: {}", value);
+
+
+            if (value == null || value.trim().isEmpty()) {
+                isAnyFieldEmpty = true;
+                break; // Não é necessário continuar verificando se já sabemos que há um campo vazio
+            }
+        }
+
+        final WebElement finalizarButton = new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(ExpectedConditions.elementToBeClickable(By.xpath(XPATH_BUTTON_FINALIZAR)));
+        finalizarButton.click();
+
+        final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
+            Assertions.fail("Não foi retornado mensagem sobre campos vazios" +
+                    ", segue os dados permitidos em cadastro: " + contentTable.getText());
+    }
+
 
 
     //@AfterEach
