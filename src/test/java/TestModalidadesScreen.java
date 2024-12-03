@@ -2,6 +2,7 @@ import com.github.javafaker.Faker;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @Log4j2
 
@@ -38,6 +40,7 @@ public class TestModalidadesScreen {
     public static final String XPATH_DATA_OFERECIMENTO = "/html/body/div[1]/div/form/div[1]/input";
     public static final String X_PATH_DESCRICAO = "/html/body/div[1]/div/form/input[1]";
     public static final String X_PATH_NOME_PROFESSOR = "/html/body/div[1]/div/form/div[3]/input";
+    public static final String XPATH_DESCRIPTION = "/html/body/div[1]/div/form/input[1]";
 
     Faker faker = new Faker();
 
@@ -69,7 +72,7 @@ public class TestModalidadesScreen {
         final WebElement container = getWebElement(driver, XPATH_CONTAINERDEAVISO);
 
         final String mensagemDevolvida = container.findElement(By.xpath(XPATH_MENSAGEM)).getText();
-        Assertions.fail("Precisava retornar a mensagem solicitando o código da modalidade para inserção, e a mensagem que retorna é: " + mensagemDevolvida);
+        fail("Precisava retornar a mensagem solicitando o código da modalidade para inserção, e a mensagem que retorna é: " + mensagemDevolvida);
     }
 
     @Test
@@ -89,7 +92,7 @@ public class TestModalidadesScreen {
         final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
         buttonListar.click();
         final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
-        Assertions.fail("Não foi retornado mensagem sobre inserção de número negativo, segue os dados permitidos em cadastro: " + contentTable.getText());
+        fail("Não foi retornado mensagem sobre inserção de número negativo, segue os dados permitidos em cadastro: " + contentTable.getText());
     }
 
     @Test
@@ -149,7 +152,7 @@ public class TestModalidadesScreen {
         finalizarButton.click();
 
         final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
-            Assertions.fail("Não foi retornado mensagem sobre campos vazios" +
+            fail("Não foi retornado mensagem sobre campos vazios" +
                     ", segue os dados permitidos em cadastro: " + contentTable.getText());
     }
 
@@ -174,7 +177,7 @@ public class TestModalidadesScreen {
         final WebElement buttonListar = getWebElement(driver,XPATH_BUTTON_LISTAR);
         buttonListar.click();
         final WebElement contentTable = getWebElement(driver,XPATH_CONTENTTABLE);
-        Assertions.fail("Não foi retornado o erro devido a data no passado, segue os dados permitidos em cadastro: " + contentTable.getText());
+        fail("Não foi retornado o erro devido a data no passado, segue os dados permitidos em cadastro: " + contentTable.getText());
     }
 
     @Test
@@ -194,13 +197,58 @@ public class TestModalidadesScreen {
         final WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
         buttonFinalizar.click();
         final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
-        Assertions.fail("Não podemos inserir número no nome, segue o preenchimento do nome: " + contentTable.getText());
+        fail("Não podemos inserir número no nome, segue o preenchimento do nome: " + contentTable.getText());
     }
 
-    //@AfterEach
-    //void tearDown() {
-    // driver.quit(); // Encerra o driver e fecha o navegador
-    //}
+    @Test
+    @Tag("Modalidades Screend")
+    @DisplayName("Should be possible to view the 'Descrição' field completely in different resolutions")
+    public void shouldbepossibletoviewtheDescriçãofieldcompletelyindifferentresolutions() {
+        Dimension[] screenSizes = {
+                new Dimension(1920, 1080),  // Desktop
+                new Dimension(1024, 768),  // Tablet (landscape)
+                new Dimension(768, 1024),  // Tablet (portrait)
+                new Dimension(375, 812)  // Mobile (iPhone X)
+        };
+
+        final WebElement inputField = getWebElement(driver, XPATH_INPUT_FIELD);
+        String codigo = faker.numerify("###");
+        inputField.sendKeys(codigo);
+
+        new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(in -> codigo.equals(inputField.getAttribute("value")));
+
+        // Clicar em "Incluir"
+        final WebElement buttonIncluir = getWebElement(driver, XPATH_BUTTON_INSERT);
+        buttonIncluir.click();
+
+        // Preencher descrição
+        final WebElement descricaoInput = getWebElement(driver, X_PATH_DESCRICAO);
+        descricaoInput.sendKeys(faker.lorem().characters(1, 10));
+        ;
+
+        //Prencher duração
+        final WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
+        buttonFinalizar.click();
+        final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
+        buttonListar.click();
+
+        // Verificar o campo Altura em diferentes resoluções
+        for (Dimension dimension : screenSizes) {
+            driver.manage().window().setSize(dimension);
+
+            // Reencontrar o elemento altura para garantir sua localização atual
+            try {
+                final WebElement height = getWebElement(driver, XPATH_DESCRIPTION);
+            } catch (Exception e) {
+                fail("Não foi possível obter a altura na dimensão: " + dimension);
+            }
+        }
+    }
+
+
+        //@AfterEach
+        //void tearDown() {
+        // driver.quit(); // Encerra o driver e fecha o navegador
+        //}
 }
-
-
