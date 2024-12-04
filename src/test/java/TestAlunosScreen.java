@@ -59,6 +59,8 @@ public class TestAlunosScreen {
         if (driver == null) {
             driver = new ChromeDriver(chromeOptions);
             driver.get(URL);// Acessa o site Acodemia
+            //Ajustar a tela para uma tela comum de desktop para evitar o erro com coleta de dados
+            driver.manage().window().maximize();
         }
     }
 
@@ -94,7 +96,7 @@ public class TestAlunosScreen {
         final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
         buttonListar.click();
         final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
-        Assertions.fail("Não foi retornado o erro, segue os dados permitidos em cadastro: " + contentTable.getText());
+        fail(STR."Não foi retornado o erro, segue os dados permitidos em cadastro: \{contentTable.getText()}");
     }
 
     @Test
@@ -106,7 +108,7 @@ public class TestAlunosScreen {
             // Espera pelo container da mensagem
             final WebElement container = getWebElement(driver, XPATH_CONTAINERDEAVISO);
         } catch (Exception e) {
-            Assertions.fail("A mensagem de aviso não foi gerada!");
+            fail("A mensagem de aviso não foi gerada!");
         }
     }
 
@@ -130,7 +132,7 @@ public class TestAlunosScreen {
         final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
         buttonListar.click();
         final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
-        Assertions.fail("Não foi retornado o erro, segue os dados permitidos em cadastro: " + contentTable.getText());
+        fail(STR."Não foi retornado o erro, segue os dados permitidos em cadastro: \{contentTable.getText()}");
     }
 
     @Test
@@ -154,7 +156,7 @@ public class TestAlunosScreen {
         final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
         buttonListar.click();
         final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
-        Assertions.fail("Não foi retornado o erro, segue os dados permitidos em cadastro: " + contentTable.getText());
+        fail("Não foi retornado o erro, segue os dados permitidos em cadastro: " + contentTable.getText());
     }
 
     @Test
@@ -177,7 +179,7 @@ public class TestAlunosScreen {
         try {
             final WebElement containerAviso = getWebElement(driver, XPATH_CONTAINERDEAVISO);
         } catch (Exception e) {
-            Assertions.fail("A mensagem de aviso não foi gerada!");
+            fail("A mensagem de aviso não foi gerada!");
         }
     }
 
@@ -247,12 +249,12 @@ public class TestAlunosScreen {
             try {
                 final WebElement height = getWebElement(driver, XPATH_HEIGHT);
             } catch (Exception e) {
-                fail("Não foi possível obter a altura na dimensão: " + dimension);
+                fail(STR."Não foi possível obter a altura na dimensão: \{dimension}");
             }
         }
     }
     @Test
-    @DisplayName("Should open Site and fill all fields with correct values return sucess ")
+    @DisplayName("Should open Site and fill all fields with correct values return sucess and 'Listar' correct values")
     public void shouldOpenSiteAndFillAllFieldsWithCorrectValues() {
         //Ajustar a tela para uma tela comum de desktop para evitar o erro com coleta de dados
         driver.manage().window().maximize();
@@ -312,11 +314,85 @@ public class TestAlunosScreen {
         //Coleta a tabela disponível na pagina de listar
         final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
         String text = contentTable.getText();
-        String comparacao = "CPF Nome Data de Nascimento Sexo Peso Altura E-mails Telefones\n" +
-                cpf +" "+ nome +" "+ new SimpleDateFormat("yyyy-MM-dd").format(dataNascimento) + " Masculino" +  " " + peso +  " undefined" + " " + email + "\n" +
-                "\n" +
-                telefone;
+        String comparacao = STR."""
+CPF Nome Data de Nascimento Sexo Peso Altura E-mails Telefones
+\{cpf} \{nome} \{new SimpleDateFormat("yyyy-MM-dd").format(dataNascimento)} Masculino \{peso} undefined \{email}
+
+\{telefone}""";
         assertEquals(text, comparacao,"Dados incompativeis, por favor verifique a inserção de dados!");
+    }
+    @Test
+    @DisplayName("Should open site and click on alterar and fill the fields")
+    public void shouldOpenSiteAndClickOnAlterarAndFillTheFields() {
+        //Ajustar a tela para uma tela comum de desktop para evitar o erro com coleta de dados
+        driver.manage().window().maximize();
+        // Preencher CPF
+        final WebElement input = getWebElement(driver, XPATH_INSERIR_CPF);
+        String cpf = faker.numerify("###.###.###-##");
+        input.sendKeys(cpf);
+        new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(in -> cpf.equals(input.getAttribute("value")));
+        //Abrir tela de inclusão
+        final WebElement buttonIncluir = getWebElement(driver, XPATH_BUTTON_INSERT);
+        buttonIncluir.click();
+        // Fechar tela de inscrição
+        final WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
+        buttonFinalizar.click();
+        // Clicar em alterar
+        final WebElement buttonAlterar = getWebElement(driver, XPATH_BUTTON_ALTERAR);
+        buttonAlterar.click();
+        // Preencher o nome
+        final WebElement nomeInput = getWebElement(driver, XPATH_NOME_INPUT);
+        String nome = faker.name().fullName();
+        nomeInput.sendKeys(nome);
+        // Preencher a data de nascimento
+        Date dataNascimento = faker.date().past(2600, TimeUnit.DAYS);
+        String dataNascimentoFormatada = new SimpleDateFormat("dd-MM-yyyy").format(dataNascimento);
+        final WebElement dateInput = getWebElement(driver, XPATH_DATE_INPUT);
+        dateInput.click();
+        dateInput.sendKeys(dataNascimentoFormatada);
+        // Preencher o sexo
+        final WebElement sexoDropdown = getWebElement(driver, XPATH_SEXO_DROPDOWN);
+        Select optionSelected = new Select(sexoDropdown);
+        optionSelected.selectByVisibleText("Masculino");
+        // Preencher Peso
+        final WebElement pesoInput = getWebElement(driver, XPATH_PESO_INPUT);
+        String peso = faker.numerify("##");
+        pesoInput.sendKeys(peso);
+        //Preencher Altura
+        final WebElement alturaInput = getWebElement(driver, XPATH_ALTURA_INPUT);
+        String Altura = faker.numerify("#,#");
+        alturaInput.sendKeys(Altura);
+        //Preencher Email
+        final WebElement emailInput = getWebElement(driver, XPATH_EMAIL_INPUT);
+        String email = faker.internet().emailAddress();
+        emailInput.sendKeys(email);
+        //Clica no botão de adicionar o e-mail
+        final WebElement emailButton = getWebElement(driver, XPATH_EMAIL_BUTTON);
+        emailButton.click();
+        //Preencher Telefone
+        final WebElement telefoneInput = getWebElement(driver, XPATH_TELEFONE_INPUT);
+        String telefone = faker.numerify("(###)#########");
+        telefoneInput.sendKeys(telefone);
+        //Clicar no botão do telefone
+        final WebElement telefoneButton = getWebElement(driver, XPATH_TELEFONE_BUTTON);
+        telefoneButton.click();
+        //Clica em finalizar
+        final WebElement finalizarButon = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
+        finalizarButon.click();
+        //clica em listar quando estiver disponível
+        final WebElement listarButton = getWebElement(driver, XPATH_BUTTON_LISTAR);
+        listarButton.click();
+        //Coleta a tabela disponível na pagina de listar
+        final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
+        String text = contentTable.getText();
+        String comparacao = STR."""
+        CPF Nome Data de Nascimento Sexo Peso Altura E-mails Telefones
+        \{cpf} \{nome} \{new SimpleDateFormat("yyyy-MM-dd").format(dataNascimento)} Masculino \{peso} undefined \{email}
+
+        \{telefone}""";
+        assertEquals(text, comparacao,"Dados incompativeis, por favor verifique a inserção de dados!");
+
     }
 
 
