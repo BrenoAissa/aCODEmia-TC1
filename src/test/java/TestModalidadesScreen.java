@@ -46,6 +46,8 @@ public class TestModalidadesScreen {
     public static final String X_PATH_DIAS = "/html/body/div[1]/div/form/div[1]/input";
     public static final String X_PATH_HORARIOS = "/html/body/div[1]/div/form/div[2]/input";
     public static final String X_PATH_BUTTON_ALTERAR = "/html/body/div[2]/main/div[1]/ul/li[4]/a";
+    public static final String X_PATH_EXCLUIR_BUTTON = "/html/body/div[2]/main/div[1]/ul/li[5]/a";
+    public static final String XPATH_EXCLUIR_BUTTON_ON_CONTAINER = "/html/body/div[1]/div/div/a[1]";
 
 
     Faker faker = new Faker();
@@ -410,6 +412,22 @@ public class TestModalidadesScreen {
         if (dadosEncontrados) {
             System.out.println("Os dados foram alterados corretamente na tabela.");
         }
+
+    }
+
+    @Test
+    @Tag("Modalidades Screend")
+    @DisplayName("Should Delete Modality")
+    public void ShouldDeleteModality(){
+        shouldincludemodality();
+        final WebElement buttonExcluir = getWebElement(driver, X_PATH_EXCLUIR_BUTTON);
+        buttonExcluir.click();
+        final WebElement containerExcluir = getWebElement(driver, XPATH_CONTAINERDEAVISO);
+        containerExcluir.findElement(By.xpath(XPATH_EXCLUIR_BUTTON_ON_CONTAINER)).click();
+        final WebElement contantTable = getWebElement(driver,XPATH_CONTENTTABLE);
+        assertEquals("CÓDIGO Descrição Duração Dias de oferecimento Horários Professores responsáveis Valor", contantTable.getText()
+                ,"O corpo retornado não está vazio, verifique se a exclusão foi feita corretamente");
+        System.out.println("Os dados foram excluídos corretamente na tabela.");
 
     }
 }
