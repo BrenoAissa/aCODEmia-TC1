@@ -4,12 +4,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import com.github.javafaker.Faker;
+import pages.RelatoriosScreenPage;
 
 @Log4j2
 public class TestRelatoriosScreen {
 
     private WebDriver driver;
-    private TestPraticasScreen testPraticasScreen;
+    private RelatoriosScreenPage relatoriosScreenPage;
     Faker faker = new Faker();
     public static final String LOCALDRIVER = "src/main/resources/drivers/chromedriver.exe";
     public static final String PROPERTY = "webdriver.chrome.driver";
@@ -22,19 +23,22 @@ public class TestRelatoriosScreen {
         chromeOptions.addArguments("--remote-allow-origins=*");
 
         driver = new ChromeDriver(chromeOptions);
+        relatoriosScreenPage = new RelatoriosScreenPage(driver);
         driver.get(URL);
     }
 
     @Test
-    @DisplayName("Should open and close chrome browser")
-    public void shouldOpenAndCloseChromeBrowser() throws InterruptedException {
-        log.info("Accessing site");
-        driver.get(URL); // Acessa o aCODEmia
-        Thread.sleep(1000); // Espera por 1 segundo
+    @DisplayName("Should not allow string input in CPF field")
+    public void shouldNotAllowStringInCpfField() {
+        String stringGenerate = faker.lorem().word();
+        relatoriosScreenPage.fillCpf(stringGenerate);
+        String cpfValue = relatoriosScreenPage.getCpfValue();
+        Assertions.assertFalse(cpfValue.equals(stringGenerate), "Era esperado que o campo não fosse preenchido por string");
     }
 
-    @AfterEach
-    void tearDown() {
-        driver.quit(); // Encerra o driver e fecha o navegador
-    }
+
+//    @AfterEach
+//    void tearDown() {
+//        driver.quit(); // Encerra o driver e fecha o navegador
+//    }
 }
