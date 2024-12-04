@@ -5,6 +5,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import com.github.javafaker.Faker;
 
@@ -35,10 +36,17 @@ public class TestAlunosScreen {
     public static final String XPATH_ALTURA_INPUT = "/html/body/div[1]/div/form/input[4]";
     public static final String XPATH_BUTTON_ALTERAR = "/html/body/div[2]/main/div[1]/ul/li[4]/a";
     public static final String XPATH_HEIGHT = "/html/body/div[2]/main/div[2]/table/tbody/tr/td[6]";
+    public static final String XPATH_EMAIL_INPUT = "/html/body/div[1]/div/form/div[1]/input";
+    public static final String XPATH_TELEFONE_INPUT = "/html/body/div[1]/div/form/div[2]/input";
+    public static final String XPATH_EMAIL_BUTTON = "/html/body/div[1]/div/form/a[1]";
+    public static final String XPATH_TELEFONE_BUTTON = "/html/body/div[1]/div/form/a[2]";
+    public static final String XPATH_NOME_INPUT = "/html/body/div[1]/div/form/input[1]";
+    public static final String XPATH_SEXO_DROPDOWN = "/html/body/div[1]/div/form/select";
     Faker faker = new Faker();
     private WebDriver driver;
     ChromeOptions chromeOptions = new ChromeOptions();
-    public WebElement getWebElement( WebDriver driver,String xPath) {
+
+    public WebElement getWebElement(WebDriver driver, String xPath) {
         return new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
                 .until(ExpectedConditions.elementToBeClickable(By.xpath(xPath)));
     }
@@ -48,54 +56,56 @@ public class TestAlunosScreen {
     void setUp() {
         System.setProperty(PROPERTY, LOCALDRIVER);
         chromeOptions.addArguments("--remote-allow-origins=*");
-        if (driver == null){
+        if (driver == null) {
             driver = new ChromeDriver(chromeOptions);
             driver.get(URL);// Acessa o site Acodemia
         }
     }
+
     @Test
     @DisplayName("Should open Site and click on Incluir with a insert error message ")
     public void shouldOpenSiteAndClickOnIncluirWithAInsertErrorMessage() {
 
-            // Espera pelo botão e clica
-            final WebElement button = getWebElement(driver, XPATH_BUTTON_INSERT);
-            button.click();
+        // Espera pelo botão e clica
+        final WebElement button = getWebElement(driver, XPATH_BUTTON_INSERT);
+        button.click();
 
-            // Espera pelo container da mensagem
-            final WebElement container = getWebElement(driver, XPATH_CONTAINERDEAVISO);
-            String returnedText = container.findElement(By.xpath(XPATH_MENSAGEM)).getText();
-            container.findElement(By.xpath(XPATH_BOTAO_FECHAR)).click();
-            // Verifica a mensagem retornada
-            assertEquals("Por favor digite o CPF do aluno que está tentando inserir!",
-                    returnedText);
+        // Espera pelo container da mensagem
+        final WebElement container = getWebElement(driver, XPATH_CONTAINERDEAVISO);
+        String returnedText = container.findElement(By.xpath(XPATH_MENSAGEM)).getText();
+        container.findElement(By.xpath(XPATH_BOTAO_FECHAR)).click();
+        // Verifica a mensagem retornada
+        assertEquals("Por favor digite o CPF do aluno que está tentando inserir!",
+                returnedText);
     }
 
     @Test
     @DisplayName("Should open Site and don't fill user infos,only cpf, with error return")
     public void shouldOpenSiteAndDontFillUserInfosOnlyCpfWithErrorReturn() {
-        final WebElement input = getWebElement(driver,XPATH_INSERIR_CPF);
+        final WebElement input = getWebElement(driver, XPATH_INSERIR_CPF);
         String cpf = faker.numerify("###.###.###-##");
         input.sendKeys(cpf);
         new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
                 .until(in -> cpf.equals(input.getAttribute("value")));
-        final WebElement buttonIncluir = getWebElement(driver,XPATH_BUTTON_INSERT);
+        final WebElement buttonIncluir = getWebElement(driver, XPATH_BUTTON_INSERT);
         buttonIncluir.click();
-        final WebElement buttonFinalizar = getWebElement(driver,XPATH_BUTTON_FINALIZAR);
+        final WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
         buttonFinalizar.click();
-        final WebElement buttonListar = getWebElement(driver,XPATH_BUTTON_LISTAR);
+        final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
         buttonListar.click();
-        final WebElement contentTable = getWebElement(driver,XPATH_CONTENTTABLE);
+        final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
         Assertions.fail("Não foi retornado o erro, segue os dados permitidos em cadastro: " + contentTable.getText());
     }
+
     @Test
     @DisplayName("Should open Site and don't fill CPF, with error return")
     public void shouldOpenSiteAndClickListarWithoutFillCPFWithErrorReturn() {
-        final WebElement buttonListar = getWebElement(driver,XPATH_BUTTON_LISTAR);
+        final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
         buttonListar.click();
-        try{
+        try {
             // Espera pelo container da mensagem
-            final WebElement container = getWebElement(driver,XPATH_CONTAINERDEAVISO);
-        }catch (Exception e){
+            final WebElement container = getWebElement(driver, XPATH_CONTAINERDEAVISO);
+        } catch (Exception e) {
             Assertions.fail("A mensagem de aviso não foi gerada!");
         }
     }
@@ -103,34 +113,35 @@ public class TestAlunosScreen {
     @Test
     @DisplayName("Should open Site and fill a future date for Data de nascimento")
     public void shouldOpenSiteAndFillAFutureDateForDataDeNascimento() {
-        final WebElement input = getWebElement(driver,XPATH_INSERIR_CPF);
+        final WebElement input = getWebElement(driver, XPATH_INSERIR_CPF);
         String cpf = faker.numerify("###.###.###-##");
         input.sendKeys(cpf);
         new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
                 .until(in -> cpf.equals(input.getAttribute("value")));
-        final WebElement buttonIncluir = getWebElement(driver,XPATH_BUTTON_INSERT);
+        final WebElement buttonIncluir = getWebElement(driver, XPATH_BUTTON_INSERT);
         buttonIncluir.click();
-        Date dataNascimento = faker.date().future(90,TimeUnit.DAYS);
+        Date dataNascimento = faker.date().future(90, TimeUnit.DAYS);
         String dataNascimentoFormatada = new SimpleDateFormat("dd-MM-yyyy").format(dataNascimento);
         final WebElement dateInput = getWebElement(driver, XPATH_DATE_INPUT);
         dateInput.click();
         dateInput.sendKeys(dataNascimentoFormatada);
-        final WebElement buttonFinalizar = getWebElement(driver,XPATH_BUTTON_FINALIZAR);
+        final WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
         buttonFinalizar.click();
-        final WebElement buttonListar = getWebElement(driver,XPATH_BUTTON_LISTAR);
+        final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
         buttonListar.click();
-        final WebElement contentTable = getWebElement(driver,XPATH_CONTENTTABLE);
+        final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
         Assertions.fail("Não foi retornado o erro, segue os dados permitidos em cadastro: " + contentTable.getText());
     }
+
     @Test
     @DisplayName("Should open Site and fill some fields with negative values return error")
     public void shouldOpenSiteAndFillSomeFieldsWithNegativeValuesReturn() {
-        final WebElement input = getWebElement(driver,XPATH_INSERIR_CPF);
+        final WebElement input = getWebElement(driver, XPATH_INSERIR_CPF);
         String cpf = faker.numerify("###.###.###-##");
         input.sendKeys(cpf);
         new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
                 .until(in -> cpf.equals(input.getAttribute("value")));
-        final WebElement buttonIncluir = getWebElement(driver,XPATH_BUTTON_INSERT);
+        final WebElement buttonIncluir = getWebElement(driver, XPATH_BUTTON_INSERT);
         buttonIncluir.click();
         final WebElement pesoInput = getWebElement(driver, XPATH_PESO_INPUT);
         String peso = faker.numerify("-##");
@@ -138,64 +149,67 @@ public class TestAlunosScreen {
         final WebElement alturaInput = getWebElement(driver, XPATH_ALTURA_INPUT);
         String alturaEmMetros = faker.numerify("-##");
         alturaInput.sendKeys(alturaEmMetros);
-        final WebElement buttonFinalizar = getWebElement(driver,XPATH_BUTTON_FINALIZAR);
+        final WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
         buttonFinalizar.click();
-        final WebElement buttonListar = getWebElement(driver,XPATH_BUTTON_LISTAR);
+        final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
         buttonListar.click();
-        final WebElement contentTable = getWebElement(driver,XPATH_CONTENTTABLE);
+        final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
         Assertions.fail("Não foi retornado o erro, segue os dados permitidos em cadastro: " + contentTable.getText());
     }
+
     @Test
     @DisplayName("should open site and click on Alterar without fill the fields with error")
     public void shouldOpenSiteAndClickAlterarWithoutFillTheFieldsWithErrorReturn() {
-        final WebElement input = getWebElement(driver,XPATH_INSERIR_CPF);
+        final WebElement input = getWebElement(driver, XPATH_INSERIR_CPF);
         String cpf = faker.numerify("###.###.###-##");
         input.sendKeys(cpf);
         new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
                 .until(in -> cpf.equals(input.getAttribute("value")));
-        final WebElement buttonIncluir = getWebElement(driver,XPATH_BUTTON_INSERT);
+        final WebElement buttonIncluir = getWebElement(driver, XPATH_BUTTON_INSERT);
         buttonIncluir.click();
-        WebElement buttonFinalizar = getWebElement(driver,XPATH_BUTTON_FINALIZAR);
+        WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
         buttonFinalizar.click();
         final WebElement buttonAlterar = getWebElement(driver, XPATH_BUTTON_ALTERAR);
         buttonAlterar.click();
         buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
         buttonFinalizar.click();
 
-        try{
-            final WebElement containerAviso = getWebElement(driver,XPATH_CONTAINERDEAVISO);
-        }catch (Exception e){
+        try {
+            final WebElement containerAviso = getWebElement(driver, XPATH_CONTAINERDEAVISO);
+        } catch (Exception e) {
             Assertions.fail("A mensagem de aviso não foi gerada!");
         }
     }
+
     @Test
     @DisplayName("Should open site and show the Altura of Aluno")
     public void shouldOpenSiteAndShowTheAlturaOfAluno() {
-        final WebElement input = getWebElement(driver,XPATH_INSERIR_CPF);
+        final WebElement input = getWebElement(driver, XPATH_INSERIR_CPF);
         String cpf = faker.numerify("###.###.###-##");
         input.sendKeys(cpf);
         new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
                 .until(in -> cpf.equals(input.getAttribute("value")));
-        final WebElement buttonIncluir = getWebElement(driver,XPATH_BUTTON_INSERT);
+        final WebElement buttonIncluir = getWebElement(driver, XPATH_BUTTON_INSERT);
         buttonIncluir.click();
         final WebElement pesoInput = getWebElement(driver, XPATH_PESO_INPUT);
-        String peso = faker.numerify("-##");
+        String peso = faker.numerify("##");
         pesoInput.sendKeys(peso);
         final WebElement alturaInput = getWebElement(driver, XPATH_ALTURA_INPUT);
-        String alturaEmMetros = faker.numerify("-#,#");
+        String alturaEmMetros = faker.numerify("#,#");
         alturaInput.sendKeys(alturaEmMetros);
-        final WebElement buttonFinalizar = getWebElement(driver,XPATH_BUTTON_FINALIZAR);
+        final WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
         buttonFinalizar.click();
-        final WebElement buttonListar = getWebElement(driver,XPATH_BUTTON_LISTAR);
+        final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
         buttonListar.click();
         final WebElement height = getWebElement(driver, XPATH_HEIGHT);
         String heightValue = height.getText();
         assertNotEquals("undefined", heightValue,
                 "O Valor da Altura está sendo representado como undefined");
     }
+
     @Test
-    @DisplayName("Should be possible to view the 'Altura' field completely in different resolutions")
-    public void shouldBePossibleToViewTheAlturaFieldCompletelyInDifferentResolutions() {
+    @DisplayName("Should be possible to view the 'Altura','E-mails' and 'Telefones' fields completely in different resolutions")
+    public void shouldBePossibleToViewTheAlturaEmailsAndTelefonesFieldCompletelyInDifferentResolutions() {
         Dimension[] screenSizes = {
                 new Dimension(1920, 1080),  // Desktop
                 new Dimension(1024, 768),  // Tablet (landscape)
@@ -216,10 +230,10 @@ public class TestAlunosScreen {
 
         // Preencher Peso
         final WebElement pesoInput = getWebElement(driver, XPATH_PESO_INPUT);
-        pesoInput.sendKeys(faker.numerify("-##"));
+        pesoInput.sendKeys(faker.numerify("##"));
         //Prencher Altura
         final WebElement alturaInput = getWebElement(driver, XPATH_ALTURA_INPUT);
-        alturaInput.sendKeys(faker.numerify("-#,#"));
+        alturaInput.sendKeys(faker.numerify("#,#"));
         final WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
         buttonFinalizar.click();
         final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
@@ -230,21 +244,89 @@ public class TestAlunosScreen {
             driver.manage().window().setSize(dimension);
 
             // Reencontrar o elemento altura para garantir sua localização atual
-            try{
+            try {
                 final WebElement height = getWebElement(driver, XPATH_HEIGHT);
-            }catch (Exception e){
+            } catch (Exception e) {
                 fail("Não foi possível obter a altura na dimensão: " + dimension);
             }
         }
     }
+    @Test
+    @DisplayName("Should open Site and fill all fields with correct values return sucess ")
+    public void shouldOpenSiteAndFillAllFieldsWithCorrectValues() {
+        //Ajustar a tela para uma tela comum de desktop para evitar o erro com coleta de dados
+        driver.manage().window().maximize();
+
+        // Preencher CPF
+        final WebElement input = getWebElement(driver, XPATH_INSERIR_CPF);
+        String cpf = faker.numerify("###.###.###-##");
+        input.sendKeys(cpf);
+        new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(in -> cpf.equals(input.getAttribute("value")));
+
+        // Clicar em "Incluir"
+        final WebElement buttonIncluir = getWebElement(driver, XPATH_BUTTON_INSERT);
+        buttonIncluir.click();
+        // Preencher o nome
+        final WebElement nomeInput = getWebElement(driver, XPATH_NOME_INPUT);
+        String nome = faker.name().fullName();
+        nomeInput.sendKeys(nome);
+        // Preencher a data de nascimento
+        Date dataNascimento = faker.date().past(2600, TimeUnit.DAYS);
+        String dataNascimentoFormatada = new SimpleDateFormat("dd-MM-yyyy").format(dataNascimento);
+        final WebElement dateInput = getWebElement(driver, XPATH_DATE_INPUT);
+        dateInput.click();
+        dateInput.sendKeys(dataNascimentoFormatada);
+        // Preencher o sexo
+        final WebElement sexoDropdown = getWebElement(driver, XPATH_SEXO_DROPDOWN);
+        Select optionSelected = new Select(sexoDropdown);
+        optionSelected.selectByVisibleText("Masculino");
+        // Preencher Peso
+        final WebElement pesoInput = getWebElement(driver, XPATH_PESO_INPUT);
+        String peso = faker.numerify("##");
+        pesoInput.sendKeys(peso);
+        //Preencher Altura
+        final WebElement alturaInput = getWebElement(driver, XPATH_ALTURA_INPUT);
+        String Altura = faker.numerify("#,#");
+        alturaInput.sendKeys(Altura);
+        //Preencher Email
+        final WebElement emailInput = getWebElement(driver, XPATH_EMAIL_INPUT);
+        String email = faker.internet().emailAddress();
+        emailInput.sendKeys(email);
+        //Clica no botão de adicionar o e-mail
+        final WebElement emailButton = getWebElement(driver, XPATH_EMAIL_BUTTON);
+        emailButton.click();
+        //Preencher Telefone
+        final WebElement telefoneInput = getWebElement(driver, XPATH_TELEFONE_INPUT);
+        String telefone = faker.numerify("(###)#########");
+        telefoneInput.sendKeys(telefone);
+        //Clicar no botão do telefone
+        final WebElement telefoneButton = getWebElement(driver, XPATH_TELEFONE_BUTTON);
+        telefoneButton.click();
+        //Clica em finalizar
+        final WebElement finalizarButon = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
+        finalizarButon.click();
+        //clica em listar quando estiver disponível
+        final WebElement listarButton = getWebElement(driver, XPATH_BUTTON_LISTAR);
+        listarButton.click();
+        //Coleta a tabela disponível na pagina de listar
+        final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
+        String text = contentTable.getText();
+        String comparacao = "CPF Nome Data de Nascimento Sexo Peso Altura E-mails Telefones\n" +
+                cpf +" "+ nome +" "+ new SimpleDateFormat("yyyy-MM-dd").format(dataNascimento) + " Masculino" +  " " + peso +  " undefined" + " " + email + "\n" +
+                "\n" +
+                telefone;
+        assertEquals(text, comparacao,"Dados incompativeis, por favor verifique a inserção de dados!");
+    }
+
 
 
     //@AfterEach
     //void tearDown() {
-        //try{
-            //driver.quit();
-        //}catch (Exception e){
-            //System.out.println("\nNavegador fechado!");
-        //}
+    //try{
+    //driver.quit();
+    //}catch (Exception e){
+    //System.out.println("\nNavegador fechado!");
+    //}
     //}
 }
