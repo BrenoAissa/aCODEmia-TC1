@@ -227,21 +227,18 @@ public class TestModalidadesScreen {
         descricaoInput.sendKeys(faker.lorem().characters(1, 10));
         ;
 
-        //Prencher duração
         final WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
         buttonFinalizar.click();
         final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
         buttonListar.click();
 
-        // Verificar o campo Altura em diferentes resoluções
+        // Verificar o campo descrição em diferentes resoluções
         for (Dimension dimension : screenSizes) {
             driver.manage().window().setSize(dimension);
-
-            // Reencontrar o elemento altura para garantir sua localização atual
             try {
                 final WebElement height = getWebElement(driver, XPATH_DESCRIPTION);
             } catch (Exception e) {
-                fail("Não foi possível obter a altura na dimensão: " + dimension);
+                fail("Não foi possível obter a descrição na dimensão: " + dimension);
             }
         }
     }
