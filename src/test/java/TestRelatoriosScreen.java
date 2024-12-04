@@ -11,12 +11,16 @@ public class TestRelatoriosScreen {
 
     private WebDriver driver;
     private RelatoriosScreenPage relatoriosScreenPage;
+    private TestModalidadesScreen testModalidadesScreen;
+    //private TestAlunosScreen testAlunosScreen;
+    private TestPraticasScreen testPraticasScreen;
     Faker faker = new Faker();
     public static final String LOCALDRIVER = "src/main/resources/drivers/chromedriver.exe";
     public static final String PROPERTY = "webdriver.chrome.driver";
     public static final String URL = "https://ciscodeto.github.io/AcodemiaGerenciamento/yrelatorios.html";
     public String stringGenerate = faker.lorem().word();
     public String numberGenerate = faker.number().toString();
+    public String cpfGenerate = faker.numerify("###.###.###-##");
 
     @BeforeEach
     void setUp() {
@@ -30,20 +34,32 @@ public class TestRelatoriosScreen {
     }
 
     @Test
-    @DisplayName("Should not allow string input in CPF field")
-    public void shouldNotAllowStringInCpfField() {
+    @DisplayName("Should open site and not allow string input in CPF field")
+    public void shouldOpenSiteNotAllowStringInCpfField() {
         relatoriosScreenPage.fillCpf(stringGenerate);
         String cpfValue = relatoriosScreenPage.getCpfValue();
         Assertions.assertFalse(cpfValue.equals(stringGenerate), "Era esperado que o campo não fosse preenchido por string");
     }
 
     @Test
-    @DisplayName("Should Fill The Field Modalidade Without Presenting An Error")
-    public void shouldFillTheFieldModalideWithoutPresentingAnError() {
+    @DisplayName("Should open site and fill the field Modalidade without presenting an error")
+    public void shouldOpenSiteAndFillTheFieldModalideWithoutPresentingAnError() {
         relatoriosScreenPage.fillModalidade(numberGenerate);
         String getModalidadeValue = relatoriosScreenPage.getModalidadeValue();
         Assertions.assertTrue(getModalidadeValue.equals(numberGenerate), "Era esperado que o campo fosse preenchido por string, caractere especial ou número");
     }
+
+    @Test
+    @DisplayName("Should open site and fill the field Modalide and click on the Filter Button")
+    public void shouldOpenSiteAndFillTheFieldModalideAndClickOnTheFilterButton (){
+        testModalidadesScreen.shouldincludemodality();
+        relatoriosScreenPage.fillModalidade(numberGenerate);
+        relatoriosScreenPage.clickFilter();
+        //implementar atualização da tabela
+        //Assertions.assertTrue(True se a tabela atualizou para qualquer coisa, "Era esperado que o botão filtrasse pelo campo de modalidade");
+    }
+
+
 
 //    @AfterEach
 //    void tearDown() {
