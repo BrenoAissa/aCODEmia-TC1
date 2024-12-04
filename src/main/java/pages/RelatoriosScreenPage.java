@@ -12,6 +12,7 @@ public class RelatoriosScreenPage {
     private WebDriverWait wait;
 
     private final By cpfField = By.id("buscador-cpf");
+    private final By modalidadeField = By.id("buscador-codigo-modalidade");
 
     public RelatoriosScreenPage(WebDriver driver) {
         this.driver = driver;
@@ -27,6 +28,17 @@ public class RelatoriosScreenPage {
     public String getCpfValue() {
         WebElement campoCpfElement = wait.until(ExpectedConditions.visibilityOfElementLocated(cpfField));
         return campoCpfElement.getAttribute("value");
+    }
+
+    public void fillModalidade (String modalidade) {
+        WebElement campoModalidadeElement = wait.until(ExpectedConditions.elementToBeClickable(modalidadeField));
+        campoModalidadeElement.clear();
+        campoModalidadeElement.sendKeys(modalidade);
+    }
+
+    public String getModalidadeValue() {
+        WebElement campoModalidadeElement = wait.until(ExpectedConditions.visibilityOfElementLocated(modalidadeField));
+        return campoModalidadeElement.getAttribute("value");
     }
 
 }

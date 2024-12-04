@@ -15,6 +15,8 @@ public class TestRelatoriosScreen {
     public static final String LOCALDRIVER = "src/main/resources/drivers/chromedriver.exe";
     public static final String PROPERTY = "webdriver.chrome.driver";
     public static final String URL = "https://ciscodeto.github.io/AcodemiaGerenciamento/yrelatorios.html";
+    public String stringGenerate = faker.lorem().word();
+    public String numberGenerate = faker.number().toString();
 
     @BeforeEach
     void setUp() {
@@ -30,12 +32,18 @@ public class TestRelatoriosScreen {
     @Test
     @DisplayName("Should not allow string input in CPF field")
     public void shouldNotAllowStringInCpfField() {
-        String stringGenerate = faker.lorem().word();
         relatoriosScreenPage.fillCpf(stringGenerate);
         String cpfValue = relatoriosScreenPage.getCpfValue();
         Assertions.assertFalse(cpfValue.equals(stringGenerate), "Era esperado que o campo não fosse preenchido por string");
     }
 
+    @Test
+    @DisplayName("Should Fill The Field Modalidade Without Presenting An Error")
+    public void shouldFillTheFieldModalideWithoutPresentingAnError() {
+        relatoriosScreenPage.fillModalidade(numberGenerate);
+        String getModalidadeValue = relatoriosScreenPage.getModalidadeValue();
+        Assertions.assertTrue(getModalidadeValue.equals(numberGenerate), "Era esperado que o campo fosse preenchido por string, caractere especial ou número");
+    }
 
 //    @AfterEach
 //    void tearDown() {
