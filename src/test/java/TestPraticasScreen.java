@@ -51,6 +51,25 @@ public class TestPraticasScreen {
         }
     }
 
+    @Test
+    @DisplayName("Should open Site and fill CPF and check error message")
+    public void shouldOpenSiteAndFillCPF() {
+        // Gera um CPF válido usando o Faker numerify
+        String cpfGenerate = faker.numerify("###.###.###-##");
+        final WebElement fieldCPF = driver.findElement(By.id("buscador-cpf"));
+
+        // Preenche o campo com o CPF
+        fieldCPF.sendKeys(cpfGenerate);
+
+        // Localiza o botão Insert
+        final WebElement buttonInsert = driver.findElement(By.id("incluir-pratica"));
+        buttonInsert.click();
+
+        // Verifica se o container está visível
+        Assertions.assertTrue(isElementPresent(driver, By.id("modal-conteudo")), "A mensagem de aviso apareceu!");
+        //driver.quit();
+    }
+
     private boolean isElementPresent(WebDriver driver, By locator) {
         try {
             driver.findElement(locator);
