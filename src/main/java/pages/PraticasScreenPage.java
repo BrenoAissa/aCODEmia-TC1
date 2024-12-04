@@ -24,6 +24,8 @@ public class PraticasScreenPage {
 
     private final By modalContent = By.id("modal-conteudo");
 
+    private final By deletePraticaButton =  By.xpath("//a[@onclick='excluirPratica([0,1]);fecharPopUp();']");
+
 
     public PraticasScreenPage(WebDriver driver) {
         this.driver = driver;
@@ -54,6 +56,11 @@ public class PraticasScreenPage {
 
     public void clickDelete () {
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(deleteButton));
+        button.click();
+    }
+
+    public void clickDeletePraticaPopUp () {
+        WebElement button = wait.until(ExpectedConditions.elementToBeClickable(deletePraticaButton));
         button.click();
     }
 

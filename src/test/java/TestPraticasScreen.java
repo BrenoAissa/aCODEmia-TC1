@@ -11,6 +11,8 @@ public class TestPraticasScreen {
 
     private WebDriver driver;
     private PraticasScreenPage praticasScreenPage;
+    private TestModalidadesScreen testModalidadesScreen;
+    //private TestAlunosScreen testAlunosScreen;
     Faker faker = new Faker();
     public static final String LOCALDRIVER = "src/main/resources/drivers/chromedriver.exe";
     public static final String PROPERTY = "webdriver.chrome.driver";
@@ -57,6 +59,16 @@ public class TestPraticasScreen {
     public void shouldOpenSiteAndClickDeleteWithoutFillCPFAndModalidade() {
         praticasScreenPage.clickDelete();
         Assertions.assertTrue(praticasScreenPage.isModalContentVisible(), "A mensagem de erro foi gerada após tentar excluir sem preencher CPF ou Modalidade.");
+    }
+
+    @Test
+    @DisplayName("Should open site and click delete by filling valid CPF")
+    public void shouldOpenSiteAndClickDeleteFillingValidCPF() {
+        //testAlunosScreen.shouldOpenSiteAndClickOnAlterarAndFillTheFields();
+        //praticasScreenPage.fillCpf(); Aqui ele deve pegar o cpf inserido no testAlunosScreen.shouldOpenSiteAndClickOnAlterarAndFillTheFields.
+        praticasScreenPage.clickDelete();
+        praticasScreenPage.clickDeletePraticaPopUp();
+        //Assertions.assertTrue(praticasScreenPage.isModalContentVisible(), "É esperado que o CPF tenha sumido do histórico");
     }
 
     @AfterEach
