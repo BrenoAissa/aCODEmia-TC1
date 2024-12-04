@@ -59,7 +59,15 @@ public class TestRelatoriosScreen {
         //Assertions.assertTrue(True se a tabela atualizou para qualquer coisa, "Era esperado que o botão filtrasse pelo campo de modalidade");
     }
 
-
+    @Test
+    @DisplayName("Should open site and fill the field CPF and click on the Filter Button")
+    public void shouldOpenSiteAndFillTheFieldCPFAndClickOnTheFilterButton (){
+        //testAlunosScreen.shouldOpenSiteAndClickOnAlterarAndFillTheFields(); estava com erro a classe
+        relatoriosScreenPage.fillCpf(cpfGenerate);
+        relatoriosScreenPage.clickFilter();
+        //implementar atualização da tabela
+        //Assertions.assertTrue(True se a tabela atualizou para qualquer coisa, "Era esperado que o botão filtrasse pelo campo de cpf");
+    }
 
 //    @AfterEach
 //    void tearDown() {
