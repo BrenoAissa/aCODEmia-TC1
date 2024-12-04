@@ -42,6 +42,8 @@ public class TestAlunosScreen {
     public static final String XPATH_TELEFONE_BUTTON = "/html/body/div[1]/div/form/a[2]";
     public static final String XPATH_NOME_INPUT = "/html/body/div[1]/div/form/input[1]";
     public static final String XPATH_SEXO_DROPDOWN = "/html/body/div[1]/div/form/select";
+    public static final String XPATH_EXCLUIR_BUTTON = "/html/body/div[2]/main/div[1]/ul/li[5]/a";
+    public static final String XPATH_EXCLUIR_BUTTON_ON_CONTAINER = "/html/body/div[1]/div/div/a[1]";
     Faker faker = new Faker();
     private WebDriver driver;
     ChromeOptions chromeOptions = new ChromeOptions();
@@ -315,10 +317,10 @@ public class TestAlunosScreen {
         final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
         String text = contentTable.getText();
         String comparacao = STR."""
-CPF Nome Data de Nascimento Sexo Peso Altura E-mails Telefones
-\{cpf} \{nome} \{new SimpleDateFormat("yyyy-MM-dd").format(dataNascimento)} Masculino \{peso} undefined \{email}
+        CPF Nome Data de Nascimento Sexo Peso Altura E-mails Telefones
+        \{cpf} \{nome} \{new SimpleDateFormat("yyyy-MM-dd").format(dataNascimento)} Masculino \{peso} undefined \{email}
 
-\{telefone}""";
+        \{telefone}""";
         assertEquals(text, comparacao,"Dados incompativeis, por favor verifique a inserção de dados!");
     }
     @Test
@@ -394,6 +396,20 @@ CPF Nome Data de Nascimento Sexo Peso Altura E-mails Telefones
         assertEquals(text, comparacao,"Dados incompativeis, por favor verifique a inserção de dados!");
 
     }
+    @Test
+    @DisplayName("Should open site and delete one Aluno after insert someone")
+    public void ShouldOpenSiteAndDeleteOneAlunoAfterInsertSomeone() {
+        shouldOpenSiteAndFillAllFieldsWithCorrectValues();
+        final WebElement buttonExcluir = getWebElement(driver, XPATH_EXCLUIR_BUTTON);
+        buttonExcluir.click();
+        final WebElement containerExcluir = getWebElement(driver, XPATH_CONTAINERDEAVISO);
+        containerExcluir.findElement(By.xpath(XPATH_EXCLUIR_BUTTON_ON_CONTAINER)).click();
+        final WebElement contantTable = getWebElement(driver,XPATH_CONTENTTABLE);
+        assertEquals("CPF Nome Data de Nascimento Sexo Peso Altura E-mails Telefones", contantTable.getText()
+                ,"O corpo retornado não está vazio, verifique se a exclusão foi feita corretamente");
+
+    }
+
 
 
 
@@ -402,7 +418,6 @@ CPF Nome Data de Nascimento Sexo Peso Altura E-mails Telefones
     //try{
     //driver.quit();
     //}catch (Exception e){
-    //System.out.println("\nNavegador fechado!");
     //}
     //}
 }
