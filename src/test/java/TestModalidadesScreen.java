@@ -17,8 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j2
 
@@ -39,8 +38,14 @@ public class TestModalidadesScreen {
     public static final String XPATH_CONTAINER_INSERT = "/html/body/div[1]/div";
     public static final String XPATH_DATA_OFERECIMENTO = "/html/body/div[1]/div/form/div[1]/input";
     public static final String X_PATH_DESCRICAO = "/html/body/div[1]/div/form/input[1]";
+    public static final String X_PATH_PROFESSORES = "/html/body/div[1]/div/form/div[3]/input";
     public static final String X_PATH_NOME_PROFESSOR = "/html/body/div[1]/div/form/div[3]/input";
     public static final String XPATH_DESCRIPTION = "/html/body/div[1]/div/form/input[1]";
+    public static final String X_PATH_DURACAO = "/html/body/div[1]/div/form/input[2]";
+    public static final String X_PATH_VALOR = "/html/body/div[1]/div/form/input[3]";
+    public static final String X_PATH_DIAS = "/html/body/div[1]/div/form/div[1]/input";
+    public static final String X_PATH_HORARIOS = "/html/body/div[1]/div/form/div[2]/input";
+
 
     Faker faker = new Faker();
 
@@ -242,10 +247,89 @@ public class TestModalidadesScreen {
             }
         }
     }
+//TESTES DE SUCESSO
+
+    @Test
+    @Tag("Modalidades Screend")
+    @DisplayName("Should include modality")
+    public void shouldincludemodality() {
+        driver.manage().window().maximize();
+
+        final WebElement inputField = getWebElement(driver, XPATH_INPUT_FIELD);
+        String codigo = faker.numerify("###");
+        inputField.sendKeys(codigo);
+        new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
+                .until(in -> codigo.equals(inputField.getAttribute("value")));
+        final WebElement buttonIncluir = getWebElement(driver, XPATH_BUTTON_INSERT);
+        buttonIncluir.click();
 
 
-        //@AfterEach
-        //void tearDown() {
-        // driver.quit(); // Encerra o driver e fecha o navegador
-        //}
+        //Preencher descrição
+        final WebElement descricaoInput = getWebElement(driver, X_PATH_DESCRICAO);
+        String descricao = faker.lorem().characters(1, 10);
+        descricaoInput.sendKeys(descricao);
+
+        //Preencher duração
+        final WebElement duracaoInput = getWebElement(driver, X_PATH_DURACAO);
+        int hora = faker.number().numberBetween(0, 24);
+        int minuto = faker.number().numberBetween(0, 60);
+        String horaFormatada = String.format("%02d:%02d", hora, minuto);
+        duracaoInput.sendKeys(horaFormatada);
+
+        //Preencher valor
+        final WebElement valorInput = getWebElement(driver, X_PATH_VALOR);
+        String valorAleatorio = String.format("%.2f", faker.number().randomDouble(2, 50, 500)); // Gera valor entre 50.00 e 500.00
+        valorInput.sendKeys(valorAleatorio);
+
+        //Preencher dias
+        final WebElement diasInput = getWebElement(driver, X_PATH_DIAS);
+        Date dataOferecimento = faker.date().future(30, TimeUnit.DAYS);
+        String dataOferecimentoFormatada = new SimpleDateFormat("dd-MM-yyyy").format(dataOferecimento);
+        final WebElement dateInput = getWebElement(driver, XPATH_DATA_OFERECIMENTO);
+        dateInput.sendKeys(dataOferecimentoFormatada);
+
+        //Preencher horários
+        final WebElement horariosInput = getWebElement(driver, X_PATH_HORARIOS);
+        String horarioAleatorio = String.format("%02d:%02d", faker.number().numberBetween(0, 24), faker.number().numberBetween(0, 60));
+        horariosInput.sendKeys(horarioAleatorio);
+
+        //Preencher Professores
+        final WebElement professoresInput = getWebElement(driver, X_PATH_PROFESSORES);
+        String professorAleatorio = faker.name().fullName(); // Nome completo aleatório
+        professoresInput.sendKeys(professorAleatorio);
+
+
+        final WebElement buttonFinalizar = getWebElement(driver, XPATH_BUTTON_FINALIZAR);
+        buttonFinalizar.click();
+        final WebElement buttonListar = getWebElement(driver, XPATH_BUTTON_LISTAR);
+        buttonListar.click();
+        // Localizar tabela e validar dados
+        final WebElement contentTable = getWebElement(driver, XPATH_CONTENTTABLE);
+        List<WebElement> linhasTabela = contentTable.findElements(By.tagName("tr"));
+        boolean dadosEncontrados = false;
+
+        for (WebElement linha : linhasTabela) {
+            List<WebElement> colunas = linha.findElements(By.tagName("td"));
+            if (colunas.size() > 0 && colunas.get(0).getText().equals(codigo)) {
+                assertEquals(descricao, colunas.get(1).getText(), "Descrição incorreta!");
+                assertEquals(horaFormatada, colunas.get(2).getText(), "Duração incorreta!");
+                assertEquals(horarioAleatorio, colunas.get(4).getText(), "Horário incorreto!");
+                assertEquals(professorAleatorio, colunas.get(5).getText(), "Professor incorreto!");
+                assertEquals(valorAleatorio, colunas.get(6).getText(), "Valor incorreto!");
+                dadosEncontrados = true;
+                break;
+            }
+        }
+
+        assertTrue(dadosEncontrados, "Dados não encontrados na tabela!");
+        if (dadosEncontrados) {
+            System.out.println("Os dados foram inseridos corretamente na tabela.");
+        }
+    }
 }
+
+
+//@AfterEach
+//void tearDown() {
+//driver.quit(); // Encerra o driver e fecha o navegador
+//}
