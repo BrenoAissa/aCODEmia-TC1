@@ -70,6 +70,26 @@ public class TestPraticasScreen {
         //driver.quit();
     }
 
+    @Test
+    @DisplayName("Should open Site and fill Modalidade and check error message")
+    public void shouldOpenSiteAndFillModalidade() {
+        // Gera uma string aleatória para o campo Modalidade com faker lorem word
+        String modalidadeGerada = faker.lorem().word(); // Gera uma palavra aleatória para modalidade
+
+        // Localiza o campo de Modalidade
+        final WebElement fieldModalidade = driver.findElement(By.id("buscador-codigo"));
+        // Preenche o campo de Modalidade com a string gerada
+        fieldModalidade.sendKeys(modalidadeGerada);
+
+        // Localiza o botão Insert
+        final WebElement buttonInsert = driver.findElement(By.id("incluir-pratica"));
+        buttonInsert.click();
+
+        // Verifica se o container está visível (ou presente)
+        Assertions.assertTrue(isElementPresent(driver, By.id("modal-conteudo")), "A mensagem de aviso apareceu!");
+        //driver.quit();
+    }
+
     private boolean isElementPresent(WebDriver driver, By locator) {
         try {
             driver.findElement(locator);
