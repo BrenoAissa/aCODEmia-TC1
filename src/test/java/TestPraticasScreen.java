@@ -17,16 +17,19 @@ import java.time.Duration;
 
 @Log4j2
 public class TestPraticasScreen {
+    Faker faker = new Faker();
     public static final String LOCALDRIVER = "src/main/resources/drivers/chromedriver.exe";
     public static final String PROPERTY = "webdriver.chrome.driver";
     public static final String URL = "https://ciscodeto.github.io/AcodemiaGerenciamento/ypraticas.html";
     public static final int WAITTIME = 7;
-    Faker faker = new Faker();
+    public String cpfGenerate = faker.numerify("###.###.###-##");
+    public String modalidadeGenerate = faker.lorem().word();
     private WebDriver driver;
     ChromeOptions chromeOptions = new ChromeOptions();
     public WebElement getWebElement( WebDriver driver,String xPath) {
         return new WebDriverWait(driver, Duration.ofSeconds(WAITTIME))
                 .until(ExpectedConditions.elementToBeClickable(By.xpath(xPath)));
+
     }
 
     @BeforeEach
@@ -55,7 +58,6 @@ public class TestPraticasScreen {
     @DisplayName("Should open Site and fill CPF and check error message")
     public void shouldOpenSiteAndFillCPF() {
         // Gera um CPF válido usando o Faker numerify
-        String cpfGenerate = faker.numerify("###.###.###-##");
         final WebElement fieldCPF = driver.findElement(By.id("buscador-cpf"));
 
         // Preenche o campo com o CPF
@@ -74,12 +76,12 @@ public class TestPraticasScreen {
     @DisplayName("Should open Site and fill Modalidade and check error message")
     public void shouldOpenSiteAndFillModalidade() {
         // Gera uma string aleatória para o campo Modalidade com faker lorem word
-        String modalidadeGerada = faker.lorem().word(); // Gera uma palavra aleatória para modalidade
 
         // Localiza o campo de Modalidade
         final WebElement fieldModalidade = driver.findElement(By.id("buscador-codigo"));
+
         // Preenche o campo de Modalidade com a string gerada
-        fieldModalidade.sendKeys(modalidadeGerada);
+        fieldModalidade.sendKeys(modalidadeGenerate);
 
         // Localiza o botão Insert
         final WebElement buttonInsert = driver.findElement(By.id("incluir-pratica"));
@@ -87,6 +89,32 @@ public class TestPraticasScreen {
 
         // Verifica se o container está visível (ou presente)
         Assertions.assertTrue(isElementPresent(driver, By.id("modal-conteudo")), "A mensagem de aviso apareceu!");
+        //driver.quit();
+    }
+
+    @Test
+    @DisplayName("Should open Site and fill CPF and Modalidade")
+    public void shouldOpenSiteAndFillCPFAndModalidade() {
+        // Gera um CPF válido usando o Faker numerify
+
+        // Localiza o campo de CPF utilizando o XPATH
+        final WebElement fieldCPF = driver.findElement(By.id("buscador-cpf"));
+
+        // Preenche o campo com o CPF gerado
+        fieldCPF.sendKeys(cpfGenerate);
+
+        // Localiza o campo de Modalidade
+        final WebElement fieldModalidade = driver.findElement(By.id("buscador-codigo"));
+
+        // Preenche o campo de Modalidade com a string gerada
+        fieldModalidade.sendKeys(modalidadeGenerate);
+
+        // Localiza o botão Insert
+        final WebElement buttonInsert = driver.findElement(By.id("incluir-pratica"));
+        buttonInsert.click();
+
+        // Verifica se o container está visível
+        Assertions.assertTrue(isElementPresent(driver, By.id("modal-conteudo")), "A mensagem de aluno ou modalidade");
         //driver.quit();
     }
 
