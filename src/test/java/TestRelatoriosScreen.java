@@ -1,5 +1,6 @@
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.*;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -11,9 +12,9 @@ public class TestRelatoriosScreen {
 
     private WebDriver driver;
     private RelatoriosScreenPage relatoriosScreenPage;
-    private TestModalidadesScreen testModalidadesScreen;
-    //private TestAlunosScreen testAlunosScreen;
-    private TestPraticasScreen testPraticasScreen;
+    private TestModalidadesScreen testModalidadesScreen = new TestModalidadesScreen();
+//    private TestAlunosScreen testAlunosScreen = new TestAlunosScreen();
+//    private TestPraticasScreen testPraticasScreen = new TestPraticasScreen();
     Faker faker = new Faker();
     public static final String LOCALDRIVER = "src/main/resources/drivers/chromedriver.exe";
     public static final String PROPERTY = "webdriver.chrome.driver";
@@ -59,18 +60,9 @@ public class TestRelatoriosScreen {
         //Assertions.assertTrue(True se a tabela atualizou para qualquer coisa, "Era esperado que o botão filtrasse pelo campo de modalidade");
     }
 
-    @Test
-    @DisplayName("Should open site and fill the field CPF and click on the Filter Button")
-    public void shouldOpenSiteAndFillTheFieldCPFAndClickOnTheFilterButton (){
-        //testAlunosScreen.shouldOpenSiteAndClickOnAlterarAndFillTheFields(); estava com erro a classe
-        relatoriosScreenPage.fillCpf(cpfGenerate);
-        relatoriosScreenPage.clickFilter();
-        //implementar atualização da tabela
-        //Assertions.assertTrue(True se a tabela atualizou para qualquer coisa, "Era esperado que o botão filtrasse pelo campo de cpf");
-    }
 
-//    @AfterEach
-//    void tearDown() {
-//        driver.quit(); // Encerra o driver e fecha o navegador
-//    }
+    @AfterEach
+    void tearDown() {
+        driver.quit(); // Encerra o driver e fecha o navegador
+    }
 }
