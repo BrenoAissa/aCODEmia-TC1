@@ -118,6 +118,17 @@ public class TestPraticasScreen {
         //driver.quit();
     }
 
+    @Test
+    @DisplayName("Should open Site and click Delete without CPF and Modalidade, showing error message")
+    public void shouldOpenSiteAndClickDeleteWithoutFillCPFAndModalidade() {
+        final WebElement buttonDelete = driver.findElement(By.id("excluir-pratica"));
+        buttonDelete.click();
+
+        // Verifica se o erro foi gerado, ou seja, o container de erro apareceu
+        Assertions.assertTrue(isElementPresent(driver, By.id("modal-conteudo")), "A mensagem de erro não foi gerada após tentar excluir sem preencher CPF ou Modalidade.");
+        //driver.quit();
+    }
+
     private boolean isElementPresent(WebDriver driver, By locator) {
         try {
             driver.findElement(locator);
