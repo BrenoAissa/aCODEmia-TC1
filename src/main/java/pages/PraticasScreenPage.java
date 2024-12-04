@@ -44,6 +44,11 @@ public class PraticasScreenPage {
         campoModalidadeElement.sendKeys(modalidade);
     }
 
+    public String getCpfValue() {
+        WebElement campoCpfElement = wait.until(ExpectedConditions.visibilityOfElementLocated(cpfField));
+        return campoCpfElement.getAttribute("value");
+    }
+
     public void clickList () {
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(listButton));
         button.click();

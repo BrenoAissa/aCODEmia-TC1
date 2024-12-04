@@ -17,6 +17,8 @@ public class TestPraticasScreen {
     public static final String LOCALDRIVER = "src/main/resources/drivers/chromedriver.exe";
     public static final String PROPERTY = "webdriver.chrome.driver";
     public static final String URL = "https://ciscodeto.github.io/AcodemiaGerenciamento/ypraticas.html";
+    public String modalidadeGenerate = faker.lorem().word();
+    public String cpfGenerate = faker.numerify("###.###.###-##");
 
     @BeforeEach
     void setUp() {
@@ -37,9 +39,16 @@ public class TestPraticasScreen {
     }
 
     @Test
+    @DisplayName("Should open Site and fill CPF with non-numeric")
+    public void shouldOpenSiteAndFillCPFWithString() {
+        praticasScreenPage.fillCpf(modalidadeGenerate);
+        String cpfValue = praticasScreenPage.getCpfValue();
+        Assertions.assertTrue(cpfValue.isEmpty(), "Não foi possível adicionar uma string no campo CPF");
+    }
+
+    @Test
     @DisplayName("Should open Site and fill CPF and check error message")
     public void shouldOpenSiteAndFillCPF() {
-        String cpfGenerate = faker.numerify("###.###.###-##");
         praticasScreenPage.fillCpf(cpfGenerate);
         praticasScreenPage.clickInclude();
         Assertions.assertTrue(praticasScreenPage.isModalContentVisible(), "A mensagem de erro foi gerada!");
@@ -48,7 +57,6 @@ public class TestPraticasScreen {
     @Test
     @DisplayName("Should open Site and fill Modalidade and check error message")
     public void shouldOpenSiteAndFillModalidade() {
-        String modalidadeGenerate = faker.lorem().word();
         praticasScreenPage.fillModalidade(modalidadeGenerate);
         praticasScreenPage.clickInclude();
         Assertions.assertTrue(praticasScreenPage.isModalContentVisible(), "A mensagem de erro foi gerada!");
