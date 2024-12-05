@@ -215,14 +215,14 @@ public class TestModalidadesScreen {
         // Localizar tabela e validar dados
         modalidadesScreenPage.getContentTableText();
         String comparacao =
-                "Codigo Descrição Duration Valor Dias Horarios Professores\n" +
+                "CÓDIGO Descrição Duração Dias de oferecimento Horários Professores responsáveis Valor\n" +
                         codigo + " " +
                         descricao + " " +
                         horaFormatada + " " +
-                        dataOferecimentoFormatadaFuture + " " +
-                        horarioAleatorio + " " +
-                        professorAleatorio + " " +
-                        valorAleatorio + " ";
+                        new SimpleDateFormat("yyyy-MM-dd").format(dataOferecimentoFuture)  + "\n" +
+                        horarioAleatorio + "\n" +
+                        professorAleatorio + "\n" +
+                        valorAleatorio;
 
 
         assertEquals(modalidadesScreenPage.getContentTableText(), comparacao, "Dados incompativeis, por favor verifique a inserção de dados!");
@@ -237,6 +237,10 @@ public class TestModalidadesScreen {
         modalidadesScreenPage.fillCodigo(codigo);
 
         modalidadesScreenPage.waitCodigoFill(codigo);
+
+        modalidadesScreenPage.clickInsertButton();
+
+        modalidadesScreenPage.clickButtonFinalizar();
 
         modalidadesScreenPage.clickButtonAlterar();
 
@@ -263,14 +267,14 @@ public class TestModalidadesScreen {
         // Localizar tabela e validar dados
         modalidadesScreenPage.getContentTableText();
         String comparacao =
-                "Codigo Descrição Duration Valor Dias Horarios Professores\n" +
+                "CÓDIGO Descrição Duração Dias de oferecimento Horários Professores responsáveis Valor\n" +
                         codigo + " " +
                         descricao + " " +
                         horaFormatada + " " +
-                        dataOferecimentoFormatadaFuture + " " +
-                        horarioAleatorio + " " +
-                        professorAleatorio + " " +
-                        valorAleatorio + " ";
+                        new SimpleDateFormat("yyyy-MM-dd").format(dataOferecimentoFuture)  + "\n" +
+                        horarioAleatorio + "\n" +
+                        professorAleatorio + "\n" +
+                        valorAleatorio;
 
 
         assertEquals(modalidadesScreenPage.getContentTableText(),comparacao,"Dados incompativeis, por favor verifique a inserção de dados!");
